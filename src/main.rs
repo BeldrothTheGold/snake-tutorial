@@ -1,39 +1,32 @@
-extern crate piston_window;
-extern crate rand;
+use piston_window::{*, types::Color};
+use crate::game::Game;
 
-mod draw;
 mod snake;
+mod draw;
 mod game;
 
-use piston_window::*;
-use piston_window::types::Color;
+const BACKGROUND_COLOR: Color = [0.0, 0.0, 0.0, 1.0];
 
-use crate::game::Game;
-use crate::draw::to_coord_u32;
-
-const BACK_COLOR: Color = [0.5, 0.5, 0.5, 1.0];
-
-
+const GAME_WIDTH: u32 = 20;
+const GAME_HEIGHT: u32 = 20;
 
 fn main() {
-    let (width, height) = (30, 30);
+    let (gui_x, gui_y) = draw::to_coord(GAME_WIDTH, GAME_HEIGHT);
+    let mut window: piston_window::PistonWindow = piston_window::WindowSettings::new(
+        "RSnake",
+        [gui_x, gui_y],
+    ).exit_on_esc(true)
+    .build().unwrap();
 
-    let mut window: PistonWindow =
-        WindowSettings::new("Snake", [to_coord_u32(width), to_coord_u32(height)])
-            .exit_on_esc(true)
-            .build()
-            .unwrap();
-
-    let mut game = Game::new(width, height);
+    let mut game = Game::new(GAME_WIDTH, GAME_HEIGHT);
     while let Some(event) = window.next() {
         if let Some(Button::Keyboard(key)) = event.press_args() {
             game.key_pressed(key);
         }
         window.draw_2d(&event, |c, g, _| {
-            clear(BACK_COLOR, g);
-            game.draw(&c, g);
+            clear(BACKGROUND_COLOR, g);
+            game.draw(&c,g);
         });
-
         event.update(|arg| {
             game.update(arg.dt);
         });
